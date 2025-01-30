@@ -1,0 +1,26 @@
+7. SQL ORDER BY Keyword
+ - Task: Get all books ordered by their publication date in descending order.
+ SELECT FROM 
+
+8.SELECT books.BookID,authors.AuthorID,authors.Name AS authorName FROM books INNER JOIN authors ON books.AuthorID=authors.AuthorID;
+
+
+
+
+TASK advance  3:
+SELECT members.FirstName,members.LastName,members.Email,members.JoinDate FROM members INNER JOIN borrowedbooks ON members.MemberID = borrowedbooks.MemberID WHERE JoinDate >'2023-01-01' GROUP BY members.MemberID HAVING COUNT(borrowedbooks.BorrowID) >3 AND members.Email NOT LIKE '%@example.com' ORDER BY members.LastName ASC;
+
+
+TASK advance  4:
+SELECT MIN(books.price) , MAX(books.price)FROM borrowedbooks INNER JOIN books ON borrowedbooks.BookID = books.BookID INNER JOIN members ON borrowedbooks.MemberID =members.MemberID WHERE members.JoinDate >'2023-01-01';
+
+
+4.
+SELECT borrowedbooks.MemberID ,
+COUNT(borrowedbooks.BookID)FROM borrowedbooks GROUP BY borrowedbooks.MemberID;
+
+5.5. SQL INNER JOIN Keyword
+• Task: Retrieve a list of members along with the titles of the books they have
+borrowed
+SELECT members.MemberID,members.FirstName,members.LastName ,books.Title FROM borrowedbooks INNER JOIN books ON borrowedbooks.BookID = books.BookID INNER JOIN members ON
+members.MemberID=borrowedbooks.MemberID;

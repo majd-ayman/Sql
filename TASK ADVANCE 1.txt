@@ -1,0 +1,252 @@
+TASK ADVANCE 1:
+Online Bookstore Sales Contest
+
+
+7. اعلى قيمة مبيعات في اليوم 
+SELECT 
+    s.sale_date, 
+    SUM(s.quantity) AS total_books_sold
+FROM 
+    Sales s
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    s.sale_date
+ORDER BY 
+    total_books_sold DESC
+LIMIT 1;
+
+اقل قيمة مبيعات 
+SELECT 
+    s.sale_date, 
+    SUM(s.quantity) AS total_books_sold
+FROM 
+    Sales s
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    s.sale_date
+ORDER BY 
+    total_books_sold ASC
+LIMIT 1;
+مقارنة المبيعات خلال الايام 
+SELECT 
+    s.sale_date, 
+    SUM(s.quantity) AS total_books_sold,
+    LEAD(SUM(s.quantity)) OVER (ORDER BY s.sale_date) AS next_day_sales,
+    (SUM(s.quantity) - LEAD(SUM(s.quantity)) OVER (ORDER BY s.sale_date)) AS sales_difference
+FROM 
+    Sales s
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    s.sale_date
+ORDER BY 
+    s.sale_date;
+14.SELECT 
+    COUNT(DISTINCT s.sale_id) AS total_sales, 
+    COUNT(DISTINCT s.book_id) AS unique_books_sold,
+    b.title AS highest_selling_book,
+    MAX(s.quantity) AS highest_quantity_sold
+FROM 
+    Sales s
+JOIN 
+    Books b ON s.book_id = b.book_id
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    b.book_id
+ORDER BY 
+    highest_quantity_sold DESC
+LIMIT 1;
+
+
+
+
+13.
+ SELECT 
+    s.sale_date,
+    s.book_id,
+    b.title,
+    SUM(s.quantity) AS total_quantity_sold
+FROM 
+    Sales s
+JOIN 
+    Books b ON s.book_id = b.book_id
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    s.sale_date, s.book_id
+HAVING 
+    total_quantity_sold < 5
+ORDER BY 
+    s.sale_date, total_quantity_sold ASC;
+
+
+12.SELECT 
+    s.sale_date,
+    s.book_id,
+    b.title,
+    SUM(s.quantity) AS total_quantity_sold
+FROM 
+    Sales s
+JOIN 
+    Books b ON s.book_id = b.book_id
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    s.sale_date, s.book_id
+HAVING 
+    total_quantity_sold > 1
+ORDER BY 
+    s.sale_date, total_quantity_sold DESC;
+
+11. 
+SELECT 
+    s.sale_date,
+    s.book_id,
+    MAX(s.quantity) AS max_quantity_sold
+FROM 
+    Sales s
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    s.sale_date, s.book_id
+ORDER BY 
+    s.sale_date, max_quantity_sold DESC
+
+10. 
+SELECT 
+    s.sale_date,
+    s.book_id,
+    COUNT(s.sale_id) AS total_sales
+FROM 
+    Sales s
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    s.sale_date, s.book_id
+ORDER BY 
+    s.sale_date, s.book_id;
+
+
+9.SELECT 
+    s.book_id, 
+    b.title,
+    COUNT(DISTINCT s.sale_date) AS days_sold
+FROM 
+    Sales s
+JOIN 
+    Books b ON s.book_id = b.book_id
+WHERE 
+    s.sale_date BETWEEN '2024-04-01' AND '2024-04-15'
+GROUP BY 
+    s.book_id
+ORDER BY 
+    days_sold DESC;
+
+
+
+
+TASK ADVANCE 2 :
+1. 
+
+SELECT customers.customer_id, customers.customer_name, orders.order_id, orders.order_date
+FROM customers
+INNER JOIN orders ON customers.customer_id = orders.customer_id;
+
+
+2.
+
+ SELECT products.product_id, products.product_name, order_details.order_detail_id, order_details.quantity, order_details.price
+FROM products
+LEFT JOIN order_details ON products.product_id = order_details.product_id;
+
+3.
+
+
+SELECT employees.employee_id, employees.employee_name, departments.department_name
+FROM employees
+RIGHT JOIN departments ON employees.department_id = departments.department_id;
+    
+
+4.
+
+
+SELECT products.product_id, products.product_name, SUM(order_details.quantity * order_details.price) AS total_sales
+FROM order_details
+INNER JOIN products ON order_details.product_id = products.product_id
+GROUP BY products.product_id;
+
+5.
+
+
+SELECT customers.customer_name, products.product_name, order_details.quantity
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.customer_id
+INNER JOIN order_details ON orders.order_id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.product_id;
+
+
+6.
+
+
+SELECT customers.customer_name, COUNT(orders.order_id) AS total_orders
+FROM customers
+INNER JOIN orders ON customers.customer_id = orders.customer_id
+GROUP BY customers.customer_id
+HAVING COUNT(orders.order_id) > 5;
+.
+
+7.
+SELECT employees.employee_name, projects.project_name
+FROM employees
+LEFT JOIN employee_projects ON employees.employee_id = employee_projects.employee_id
+LEFT JOIN projects ON employee_projects.project_id = projects.project_id
+
+UNION
+
+SELECT employees.employee_name, projects.project_name
+FROM employees
+RIGHT JOIN employee_projects ON employees.employee_id = employee_projects.employee_id
+RIGHT JOIN projects ON employee_projects.project_id = projects.project_id
+ORDER BY employee_name, project_name;
+
+8.
+
+
+SELECT customers.customer_id, customers.customer_name, customers.status, orders.order_id, orders.order_date
+FROM customers
+INNER JOIN orders ON customers.customer_id = orders.customer_id
+WHERE customers.status = 'active'
+
+UNION
+
+SELECT customers.customer_id, customers.customer_name, customers.status, orders.order_id, orders.order_date
+FROM customers
+INNER JOIN orders ON customers.customer_id = orders.customer_id
+WHERE customers.status = 'inactive'
+ORDER BY status, customer_name;
+
+9.
+
+
+SELECT 
+    orders.order_id, 
+    customers.customer_name,
+    orders.order_date,
+    orders.shipping_date,
+    CASE
+        WHEN orders.shipping_date IS NOT NULL THEN 'Shipped'
+        WHEN orders.shipping_date IS NULL AND orders.order_date IS NOT NULL THEN 'Pending'
+        ELSE 'Canceled'
+    END AS order_status
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.customer_id
+ORDER BY orders.order_date;
+
+
+
+
+
+
