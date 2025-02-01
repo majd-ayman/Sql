@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #DC3545;
+            color: black;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #a71d2a;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .signup-text {
+            margin-top: 20px;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Sign Up</h1>
+        <form id="signupForm">
+            
+            <!-- Full Name -->
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
+            <div id="nameError" class="error"></div>
+
+            <label for="middleName">Middle Name:</label>
+            <input type="text" id="middleName" name="middleName" placeholder="Middle Name" required>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
+
+            <label for="familyName">Family Name:</label>
+            <input type="text" id="familyName" name="familyName" placeholder="Family Name" required>
+            <!-- Email -->
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <div id="emailError" class="error"></div>
+
+            <!-- Mobile -->
+            <label for="mobile">Mobile:</label>
+            <input type="text" id="mobile" name="mobile" placeholder="Mobile" required>
+            <div id="mobileError" class="error"></div>
+
+
+            <!-- Password -->
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <div id="passwordError" class="error"></div>
+
+            <!-- Confirm Password -->
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required>
+            <div id="confirmPasswordError" class="error"></div>
+
+            <button type="submit">Sign Up</button>
+            <div class="signup-text">
+                <p>Already have an account? <a href="login.php">Login</a></p>
+            </div>
+        </form>
+        <div id="responseMessage" class="error-message"></div>
+    </div>
+
+    <script>
+        // التعامل مع التحقق من صحة النموذج
+        document.getElementById("signupForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            let valid = validateForm();
+
+            if (valid) {
+                // جمع البيانات من النموذج
+                const formData = new FormData(document.getElementById("signupForm"));
+
+                // إرسال البيانات عبر AJAX
+                fetch('signup.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+console.log(data);
+const messageDiv = document.getElementById('responseMessage');
+if (data.status === "success") {
+    messageDiv.style.color = "green";
+    messageDiv.textContent = data.message;
+
+    setTimeout(function () {
+        window.location.href = "login.php";
+    }, 2000);
+} else {
+    messageDiv.style.color = "red";
+    messageDiv.textContent = data.message;
+
+
+    if (data.errors) {
+        if (data.errors.email) {
+            document.getElementById('emailError').textContent = data.errors.email;
+        }
+        if (data.errors.password) {
+            document.getElementById('passwordError').textContent = data.errors.password;
+        }
+        if (data.errors.mobile) {
+            document.getElementById('mobileError').textContent = data.errors.mobile;
+        }
+        if (data.errors.fullName) {
+            document.getElementById('nameError').textContent = data.errors.fullName;
+        }
+    }
+}
+})
+                    .catch(error => {
+                        console.error('Error:', error);
+                        document.getElementById('responseMessage').textContent = "حدث خطأ أثناء الاتصال بالسيرفر!";
+                    });
+            }
+        });
+
+        function validateForm() {
+            let valid = true;
+
+            // Email validation
+            const email = document.getElementById('email').value;
+            const emailError = document.getElementById('emailError');
+            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            if (!email.match(emailPattern)) {
+                emailError.textContent = 'Please enter a valid email address.';
+                valid = false;
+            } else {
+                emailError.textContent = '';
+            }
+
+            // Mobile validation (10 digits)
+            const mobile = document.getElementById('mobile').value;
+            const mobileError = document.getElementById('mobileError');
+            const mobilePattern = /^[0-9]{10}$/;
+            if (!mobile.match(mobilePattern)) {
+                mobileError.textContent = 'Please enter a valid 10-digit mobile number.';
+                valid = false;
+            } else {
+                mobileError.textContent = '';
+            }
+
+            // Full Name validation (all fields should have text)
+            const firstName = document.getElementById('firstName').value;
+            const middleName = document.getElementById('middleName').value;
+            const lastName = document.getElementById('lastName').value;
+            const familyName = document.getElementById('familyName').value;
+            const nameError = document.getElementById('nameError');
+            if (!firstName || !middleName || !lastName || !familyName) {
+                nameError.textContent = 'All name fields must be filled out.';
+                valid = false;
+            } else {
+                nameError.textContent = '';
+            }
+
+            // Password validation
+            const password = document.getElementById('password').value;
+const passwordError = document.getElementById('passwordError');
+
+const passwordPattern = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+
+if (!password.match(passwordPattern)) {
+    passwordError.textContent = 'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل، وحرف كبير، وحرف صغير، ورقم، ورمز خاص.';
+    valid = false;
+} else {
+    passwordError.textContent = '';
+}
+
+            // Confirm Password validation
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            if (password !== confirmPassword) {
+                confirmPasswordError.textContent = 'Passwords do not match.';
+                valid = false;
+            } else {
+                confirmPasswordError.textContent = '';
+            }
+
+            return valid;
+        }
+    </script>
+
+
+</body>
+
+</html>
